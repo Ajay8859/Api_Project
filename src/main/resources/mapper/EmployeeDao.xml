@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.demo.dao.Dao">
+    <resultMap type="com.example.demo.entity.Employee" id="EmployeeResult">
+        <result property="emp_Id" column="emp_Id"/>
+        <result property="emp_Name" column="emp_Name"/>
+
+        <association property="emp2"  javaType="com.example.demo.entity.EmployeeDetail"  >
+        	<result property="emp_Id" column="emp_Id"/>
+        	<result property="emp_Add" column="emp_Add"/>
+        	<result property="pincode" column="pincode"/>
+        </association>
+    
+    </resultMap>
+    <!--Get Data-->
+    <select id="select" resultMap="EmployeeResult">
+    SELECT *
+    FROM Employee_Details e
+    JOIN Employee_Address d ON e.emp_Id = d.emp_Id
+    WHERE e.emp_Id =#{emp_Id} or e.emp_Name=#{emp_Name} or e.emp_Designation=#{emp_Designation} or e.emp_Dod=#{emp_Dod} or d.emp_Add=#{emp_Add}; 
+    </select>
+ 
+    
+    <!--Insert Data in Employee_Detail-->
+    <insert id="insert_Detail" parameterType="com.example.demo.entity.Employee">
+    insert into Employee_Details  (emp_Id,emp_Name,emp_Designation,emp_Dod)
+    values (#{emp_Id},#{emp_Name} ,#{emp_Designation},#{emp_Dod});
+    </insert>
+    
+    <!--Insert Data in Employee_Address-->
+    <insert id="insert_Address" parameterType="com.example.demo.entity.Employee">
+    insert into Employee_Address  (emp_Id,emp_Add,pincode)
+    values (#{emp_Id},#{emp_Add},#{pincode});
+    </insert>
+
+ 
+    <!--Update -> emp_Designation or emp_Add or emp_Name-->
+    <update id="update"  parameterType="com.example.demo.entity.Employee">
+    UPDATE Employee_Details
+    JOIN Employee_Address ON Employee_Details.emp_Id = Employee_Address.emp_Id
+    SET Employee_Details.emp_Designation = #{emp_Designation},Employee_Details.emp_Name = #{emp_Name},
+    Employee_Address.emp_Add = #{emp_Add}
+    WHERE Employee_Details.emp_Id = #{emp_Id};
+    </update>
+
+    
+    <!--Delete Data-->
+    <delete id="delete" parameterType="com.example.demo.entity.Employee">
+    DELETE e, a
+    FROM Employee_Details e
+    JOIN Employee_Address a ON e.emp_Id = a.emp_Id 
+    WHERE e.emp_Id =#{emp_Id}
+    </delete>
+    
+    
+</mapper>
